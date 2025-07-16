@@ -1,0 +1,129 @@
+cabal-version:      3.8
+name:               andamio-utility-on-chain
+maintainer:         andamio.io
+version:            0.1.0.0
+build-type:         Simple
+synopsis:           A Haskell/Plutus project to support andamio off chain operations.
+
+source-repository head
+  type:     git
+  location: https://github.com/Andamio-Platform/access-token
+
+library
+  hs-source-dirs:      src
+  exposed-modules:      Andamio.Utility.OnChain
+                      , Andamio.Utility.Value
+                      , Andamio.Utility.TxInInfo
+                      , Andamio.Utility.TxOut 
+                      , Andamio.Utility.ValidatorOnChainNames 
+                      , Andamio.Utility.LazyContextV3
+                      , Andamio.Utility.Datum
+                      , Andamio.Utility.BuiltinByteString
+                      , Andamio.Utility.Redeemers
+                      , Andamio.Utility.Address
+                      , Andamio.Utility.Cbors
+                      , Andamio.Utility.SampleData
+                      , Andamio.Utility.Validators.NFTPolicyTnStrict
+                      , Andamio.Utility.Validators.AlwaysTrue
+                      , Andamio.Utility.Validators.TokenNamePolicy
+                      , Andamio.Utility.Test
+
+  build-depends:        base
+                      , plutus-ledger-api
+                      , plutus-ledger-api:plutus-ledger-api-testlib
+                      , plutus-tx
+                      , plutus-core
+                      , plutus-tx-plugin
+                      , bytestring
+                      , cardano-crypto-class
+                      , mtl
+
+  ghc-options:         -Wall 
+                       -fobject-code 
+                       -fno-ignore-interface-pragmas 
+                       -fno-omit-interface-pragmas 
+                       -fno-strictness 
+                       -fno-spec-constr 
+                       -fno-specialise
+                       -fno-unbox-small-strict-fields
+                       -fplugin-opt PlutusTx.Plugin:target-version=1.1.0 
+                       -fplugin-opt PlutusTx.Plugin:max-simplifier-iterations-pir=12
+                       -fplugin-opt PlutusTx.Plugin:max-simplifier-iterations-uplc=12
+                       -fplugin-opt PlutusTx.Plugin:max-cse-iterations=4
+                       -fplugin-opt PlutusTx.Plugin:simplifier-unwrap-cancel
+                       -fplugin-opt PlutusTx.Plugin:simplifier-beta
+                       -fplugin-opt PlutusTx.Plugin:simplifier-inline
+                       -fplugin-opt PlutusTx.Plugin:strictify-bindings
+                       -fplugin-opt PlutusTx.Plugin:simplifier-remove-dead-bindings
+                       -fplugin-opt PlutusTx.Plugin:relaxed-float-in
+                       -fplugin-opt PlutusTx.Plugin:remove-trace
+                       -fplugin-opt PlutusTx.Plugin:optimize
+                       -fplugin-opt PlutusTx.Plugin:verbosity=0
+                       -fplugin-opt PlutusTx.Plugin:inline-constants
+
+  default-language:    Haskell2010
+  
+  ghc-options:         -Wall -fobject-code -fno-ignore-interface-pragmas -fno-omit-interface-pragmas -fno-strictness -fno-spec-constr
+                       -fplugin-opt PlutusTx.Plugin:target-version=1.1.0 -fno-unbox-small-strict-fields -fno-specialise
+
+  default-extensions: NoImplicitPrelude 
+                      OverloadedStrings 
+                      ScopedTypeVariables 
+                      TypeApplications 
+                      TemplateHaskell
+                      DataKinds
+                      DerivingStrategies
+                      DeriveGeneric
+                      RecordWildCards
+                      MultiParamTypeClasses
+                      DeriveAnyClass
+                      FlexibleInstances
+                      UndecidableInstances
+
+test-suite on-chain-utility-tests
+  default-extensions: TemplateHaskell 
+                      OverloadedStrings 
+                      DataKinds 
+                      NoImplicitPrelude 
+                      DerivingStrategies
+                      DeriveGeneric
+                      ScopedTypeVariables
+                      MultiParamTypeClasses
+                      ViewPatterns
+                      RecordWildCards
+                      TypeApplications
+                      Strict
+                      BangPatterns
+                      FlexibleContexts
+                      AllowAmbiguousTypes
+  ghc-options:      
+                      -Wall
+                      -Wcompat
+                      -Wunused-packages
+                      -Wincomplete-uni-patterns
+                      -Wincomplete-record-updates
+                      -Wmissing-export-lists
+                      -Wmissing-deriving-strategies
+                      -fno-show-valid-hole-fits 
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      tests
+  main-is:             on-chain-utility-tests.hs
+
+  other-modules:       Tests.Validators
+                       Tests.Address
+                       Tests.BuiltinByteString
+                       Tests.Cbors
+                       Tests.Datum
+                       Tests.LazyContextV3
+                       Tests.Redeemers
+                       Tests.TxInInfo
+                       Tests.TxOut
+                       Tests.Value
+
+  build-depends:       base 
+                     , plutus-ledger-api
+                     , plutus-tx
+                     , tasty
+                     , tasty-hunit
+                     , andamio-utility-on-chain
+                     , bytestring

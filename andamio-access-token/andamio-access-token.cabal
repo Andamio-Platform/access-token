@@ -1,0 +1,78 @@
+cabal-version:      3.8
+name:               andamio-access-token
+maintainer:         andamio.io
+version:            0.1.0.0
+build-type:         Simple
+synopsis:           A Haskell/Plutus project to index unique token names in a linked on chain list.
+
+source-repository head
+  type:     git
+  location: https://github.com/Andamio-Platform/access-token
+
+library
+  hs-source-dirs:      src
+  exposed-modules:     Index.Compiled
+                     , Index.OnChain.IndexRef.IndexData
+                     , Index.OnChain.IndexRef.IndexRefParams
+                     , Index.OnChain.IndexRefScript                   
+
+                     , Index.OnChain.IndexScripts.IndexParams
+                     , Index.OnChain.IndexScripts.SpendingScript
+                     , Index.OnChain.IndexScripts.UnlockAdaObserver
+                     , Index.OnChain.IndexScripts.MintingScript
+                     , Index.OnChain.IndexScripts
+
+                     , Index.OnChain.InitIndexPolicy
+
+  build-depends:       base 
+                     , plutus-ledger-api 
+                     , plutus-tx
+                     , plutus-tx-plugin
+                     , andamio-utility-on-chain
+                     , containers
+                     , bytestring
+
+  default-language:    Haskell2010
+
+  ghc-options:         -Wall
+                       -Wunused-packages
+                       -fobject-code 
+                       -fno-ignore-interface-pragmas 
+                       -fno-omit-interface-pragmas 
+                       -fno-strictness 
+                       -fno-spec-constr 
+                       -fno-specialise
+                       -fno-full-laziness
+                       -fno-unbox-strict-fields
+                       -fno-unbox-small-strict-fields
+                       -fplugin-opt PlutusTx.Plugin:target-version=1.1.0 
+                       -fplugin-opt PlutusTx.Plugin:max-simplifier-iterations-pir=12
+                       -fplugin-opt PlutusTx.Plugin:max-simplifier-iterations-uplc=12
+                       -fplugin-opt PlutusTx.Plugin:max-cse-iterations=4
+                       -fplugin-opt PlutusTx.Plugin:simplifier-unwrap-cancel
+                       -fplugin-opt PlutusTx.Plugin:simplifier-beta
+                       -fplugin-opt PlutusTx.Plugin:simplifier-inline
+                       -fplugin-opt PlutusTx.Plugin:strictify-bindings
+                       -fplugin-opt PlutusTx.Plugin:simplifier-remove-dead-bindings
+                       -fplugin-opt PlutusTx.Plugin:relaxed-float-in
+                       -fplugin-opt PlutusTx.Plugin:remove-trace
+                       -fplugin-opt PlutusTx.Plugin:optimize
+                       -fplugin-opt PlutusTx.Plugin:verbosity=0
+                       -fplugin-opt PlutusTx.Plugin:inline-constants
+
+  default-extensions: TemplateHaskell 
+                      OverloadedStrings 
+                      DataKinds 
+                      NoImplicitPrelude 
+                      DerivingStrategies
+                      DeriveGeneric
+                      ScopedTypeVariables
+                      MultiParamTypeClasses
+                      ViewPatterns
+                      RecordWildCards
+                      NamedFieldPuns
+                      TypeApplications
+                      Strict
+                      DeriveAnyClass
+                      FlexibleInstances
+                      UndecidableInstances
