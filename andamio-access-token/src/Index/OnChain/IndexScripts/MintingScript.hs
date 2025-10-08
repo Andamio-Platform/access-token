@@ -8,7 +8,8 @@ import PlutusTx.Prelude                       as PPr (Integer, Bool(..), fst, sn
                                                      (+), (==), otherwise, (&&), ($), error, 
                                                      (||), (<), BuiltinData)
 import PlutusTx.Builtins.Internal             as BI  (head, tail, BuiltinList(..), BuiltinPair, 
-                                                     unsafeDataAsMap, mkI)
+                                                     unsafeDataAsMap, mkI, mkCons, mkNilData,
+                                                     unitval)
 import PlutusTx.Builtins                      as B   (null)
 
 import Andamio.Utility.OnChain                       (indexTokenNameBd, lazyTxInInfoTxOutInlineDatBd,
@@ -42,7 +43,7 @@ mkMintingScript :: IndexParams -> IndexData -> BuiltinByteString -> BuiltinData 
 mkMintingScript IndexParams{..} indexData newElement ownSymbolBd txInfoMintBd txInfoInputsBd txInfoOutputsBd txInfoWdrlBd =
 
         let ownAddress = addressFromScriptHashesBd ownSymbolBd stakingScrHash
-            dat = findTxInInfoByAddrTxOutBd txInfoInputsBd
+            dat = filterTxInInfoByTokenDatumBd txInfoInputsBd (mkNilData unitval)
             toOutputDatum this next = mkInlineDatumBuiltin $ toBuiltinData (this, next)
             thisPolicyMintTnAm = tnAmBdMapByCsFromValueBd (BI.unsafeDataAsMap txInfoMintBd) ownSymbolBd
         in
@@ -57,12 +58,15 @@ mkMintingScript IndexParams{..} indexData newElement ownSymbolBd txInfoMintBd tx
         && checkSPkhPresent (initGSObsShList indexData) 0
         
     where
+
         -- own input with linked list token
-        findTxInInfoByAddrTxOutBd :: BuiltinList BuiltinData -> (BuiltinByteString, BuiltinByteString)
-        findTxInInfoByAddrTxOutBd txInInfosBd
-          | B.null txInInfosBd = error ()
-          | oneTokenInValue (lazyTxInInfoValueMapBd $ BI.head txInInfosBd) = unsafeFromBuiltinData $ lazyTxInInfoTxOutInlineDatBd (BI.head txInInfosBd)
-          | otherwise = findTxInInfoByAddrTxOutBd (BI.tail txInInfosBd)
+        filterTxInInfoByTokenDatumBd :: BuiltinList BuiltinData -> BuiltinList BuiltinData -> (BuiltinByteString, BuiltinByteString)
+        filterTxInInfoByTokenDatumBd txInInfosBd ins
+          | B.null txInInfosBd = if B.null (BI.tail ins) 
+                                 then unsafeFromBuiltinData $ lazyTxInInfoTxOutInlineDatBd (BI.head ins)
+                                 else error ()
+          | oneTokenInValue (lazyTxInInfoValueMapBd $ BI.head txInInfosBd) = filterTxInInfoByTokenDatumBd (BI.tail txInInfosBd) (mkCons (BI.head txInInfosBd) ins)
+          | otherwise = filterTxInInfoByTokenDatumBd (BI.tail txInInfosBd) ins
 
         -- either boarder token or own symbol
         oneTokenInValue :: BuiltinList (BuiltinPair BuiltinData BuiltinData) -> Bool
