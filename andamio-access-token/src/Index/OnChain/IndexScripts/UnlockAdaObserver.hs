@@ -9,11 +9,13 @@ import PlutusTx.Prelude                       as PPr (Bool(..), Integer, Builtin
 
 import PlutusTx.Builtins                      as B   (null)
 import Andamio.Utility.OnChain                       (singleTokenInValueBd, valueOfBd, lazyTxOutValueMapBd,
-                                                     lazyTxOutAddrBd, constrArgs,
-                                                     lazyTxOutReferenceScriptBd, lazyTxOutDatumBd, unitval, lengthListTupleBd,
+                                                     lazyTxOutAddrBd, constrArgs, indexTokenNameBd,
+                                                     lazyTxOutReferenceScriptBd, lazyTxOutDatumBd, lengthListTupleBd,
                                                      nothingBd, adaTokenBd, adaSymbolBd, tupleElemOnlyOne,
-                                                     lazyTxInInfoValueMapBd, addressFromScriptHashesBd, indexTokenNameBd)
-import PlutusTx.Builtins.Internal             as BI  (head, tail, BuiltinList(..), mkNilData, mkCons, mkB, BuiltinPair)
+                                                     lazyTxInInfoValueMapBd, addressFromScriptHashesBd)
+import PlutusTx.Builtins.Internal             as BI  (head, tail, BuiltinList(..), mkCons, mkB, BuiltinPair)
+import PlutusTx.Builtins.HasOpaque                   (mkNil)
+
 
 import Index.OnChain.IndexScripts.IndexParams        (IndexParams(..))
 import Index.OnChain.IndexRef.IndexData              (IndexData(..))
@@ -72,7 +74,7 @@ mkUnlockAdaObserver IndexParams{..} indexData ownBbs txInfoOutputs txInfoInputs 
 
         -- inputs with linked list token
         correctInputTxOuts :: BuiltinList BuiltinData
-        correctInputTxOuts = go txInfoInputs (mkNilData unitval)
+        correctInputTxOuts = go txInfoInputs mkNil
           where
             go :: BuiltinList BuiltinData -> BuiltinList BuiltinData -> BuiltinList BuiltinData
             go bdList counter
@@ -82,7 +84,7 @@ mkUnlockAdaObserver IndexParams{..} indexData ownBbs txInfoOutputs txInfoInputs 
 
         -- outputs back to index
         correctOutputTxOuts :: BuiltinList BuiltinData
-        correctOutputTxOuts = go txInfoOutputs (mkNilData unitval)
+        correctOutputTxOuts = go txInfoOutputs mkNil
           where
             go :: BuiltinList BuiltinData -> BuiltinList BuiltinData -> BuiltinList BuiltinData
             go bdList counter
