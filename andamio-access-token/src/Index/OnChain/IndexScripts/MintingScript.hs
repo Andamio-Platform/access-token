@@ -16,10 +16,10 @@ import Andamio.Utility.OnChain                       (indexTokenNameBd, lazyTxIn
                                                      lazyTxOutDatumBd, tnAmBdMapByCsFromValueBd,
                                                      lazyTxOutReferenceScriptBd, csElem, tupleElemOnlyOne,
                                                      lazyTxOutValueMapBd, lazyTxOutAddrBd,
-                                                     singleTokenInValueBd, flatValLength, create100Tn,
+                                                     singleTokenInValueBd, flatValLength, createGlobalTn,
                                                      addressFromScriptHashesBd, mkInlineDatumBuiltin,
                                                      nothingBd, flatValuePaidBd, lazyTxInInfoValueMapBd,
-                                                     lengthListTupleBd, builtinsElemMapBd, create222Tn)
+                                                     lengthListTupleBd, builtinsElemMapBd, createUserTn)
 
 import Index.OnChain.IndexScripts.IndexParams        (IndexParams(..))
 import Index.OnChain.IndexRef.IndexData              (IndexData(..))
@@ -49,8 +49,8 @@ mkMintingScript IndexParams{..} indexData newElement ownSymbolBd txInfoMintBd tx
         in
            lengthListTupleBd thisPolicyMintTnAm 0 == 3
         && builtinsElemMapBd thisPolicyMintTnAm indexTokenNameBd (BI.mkI 1)
-        && builtinsElemMapBd thisPolicyMintTnAm (create100Tn newElement) (BI.mkI 1)
-        && builtinsElemMapBd thisPolicyMintTnAm (create222Tn newElement) (BI.mkI 1)
+        && builtinsElemMapBd thisPolicyMintTnAm (createGlobalTn newElement) (BI.mkI 1)
+        && builtinsElemMapBd thisPolicyMintTnAm (createUserTn newElement) (BI.mkI 1)
         && feeIsPaid txInfoOutputsBd
         && checkNewOutputs ownAddress (toOutputDatum (PPr.fst dat) newElement)
         && checkNewOutputs ownAddress (toOutputDatum newElement (PPr.snd dat))
