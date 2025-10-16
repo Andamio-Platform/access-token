@@ -8,9 +8,9 @@ import PlutusTx.Prelude                       as PPr (Integer, Bool(..), fst, sn
                                                      (+), (==), otherwise, (&&), ($), error, 
                                                      (||), (<), BuiltinData)
 import PlutusTx.Builtins.Internal             as BI  (head, tail, BuiltinList(..), BuiltinPair, 
-                                                     unsafeDataAsMap, mkI, mkCons, mkNilData,
-                                                     unitval)
+                                                     unsafeDataAsMap, mkI, mkCons)
 import PlutusTx.Builtins                      as B   (null)
+import PlutusTx.Builtins.HasOpaque                   (mkNil)
 
 import Andamio.Utility.OnChain                       (indexTokenNameBd, lazyTxInInfoTxOutInlineDatBd,
                                                      lazyTxOutDatumBd, tnAmBdMapByCsFromValueBd,
@@ -43,7 +43,7 @@ mkMintingScript :: IndexParams -> IndexData -> BuiltinByteString -> BuiltinData 
 mkMintingScript IndexParams{..} indexData newElement ownSymbolBd txInfoMintBd txInfoInputsBd txInfoOutputsBd txInfoWdrlBd =
 
         let ownAddress = addressFromScriptHashesBd ownSymbolBd stakingScrHash
-            dat = filterTxInInfoByTokenDatumBd txInfoInputsBd (mkNilData unitval)
+            dat = filterTxInInfoByTokenDatumBd txInfoInputsBd mkNil
             toOutputDatum this next = mkInlineDatumBuiltin $ toBuiltinData (this, next)
             thisPolicyMintTnAm = tnAmBdMapByCsFromValueBd (BI.unsafeDataAsMap txInfoMintBd) ownSymbolBd
         in

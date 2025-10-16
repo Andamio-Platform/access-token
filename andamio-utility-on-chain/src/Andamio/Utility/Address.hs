@@ -11,32 +11,33 @@ module Andamio.Utility.Address
 import PlutusTx.Prelude                    (($), (.))
 import PlutusLedgerApi.V3                  (ScriptHash(..), BuiltinData, 
                                            toBuiltinData, unsafeFromBuiltinData)
-import PlutusTx.Builtins.Internal    as BI (mkConstr, mkNilData, mkCons, head)
-import Andamio.Utility.LazyContextV3       (unitval, constrArgs)
+import PlutusTx.Builtins.Internal    as BI (mkConstr, mkCons, head)
+import PlutusTx.Builtins.HasOpaque         (mkNil)
+import Andamio.Utility.LazyContextV3       (constrArgs)
 
 {-# INLINEABLE scriptCredFromScrHash #-}
 scriptCredFromScrHash :: ScriptHash -> BuiltinData
-scriptCredFromScrHash sh = BI.mkConstr 1 (BI.mkCons (toBuiltinData sh) (BI.mkNilData unitval))
+scriptCredFromScrHash sh = BI.mkConstr 1 (BI.mkCons (toBuiltinData sh) mkNil)
 
 {-# INLINEABLE addressFromScriptHashesBd #-}
 addressFromScriptHashesBd :: BuiltinData -> BuiltinData -> BuiltinData
-addressFromScriptHashesBd pkh spkh = BI.mkConstr 0 (BI.mkCons (scriptCredFromScrHashBd pkh) (BI.mkCons (stakingScriptBdCredFromScriptCredBd spkh) (BI.mkNilData unitval)))
+addressFromScriptHashesBd pkh spkh = BI.mkConstr 0 (BI.mkCons (scriptCredFromScrHashBd pkh) (BI.mkCons (stakingScriptBdCredFromScriptCredBd spkh) mkNil))
 
 {-# INLINEABLE scriptCredFromScrHashBd #-}
 scriptCredFromScrHashBd :: BuiltinData -> BuiltinData
-scriptCredFromScrHashBd sh = BI.mkConstr 1 (BI.mkCons sh (BI.mkNilData unitval))
+scriptCredFromScrHashBd sh = BI.mkConstr 1 (BI.mkCons sh mkNil)
 
 {-# INLINEABLE stakingScriptBdCredFromScriptCredBd #-}
 stakingScriptBdCredFromScriptCredBd:: BuiltinData -> BuiltinData
-stakingScriptBdCredFromScriptCredBd sh = BI.mkConstr 0 $ BI.mkCons (BI.mkConstr 0 $ BI.mkCons (scriptCredFromScrHashBd sh) (BI.mkNilData unitval)) (BI.mkNilData unitval)
+stakingScriptBdCredFromScriptCredBd sh = BI.mkConstr 0 $ BI.mkCons (BI.mkConstr 0 $ BI.mkCons (scriptCredFromScrHashBd sh) mkNil) mkNil
 
 {-# INLINEABLE justScriptHashBd #-}
 justScriptHashBd :: ScriptHash -> BuiltinData
-justScriptHashBd sh = mkConstr 0 (BI.mkCons (toBuiltinData sh) (BI.mkNilData unitval))
+justScriptHashBd sh = mkConstr 0 (BI.mkCons (toBuiltinData sh) mkNil)
 
 {-# INLINEABLE justBdScriptHashBd #-}
 justBdScriptHashBd :: BuiltinData -> BuiltinData
-justBdScriptHashBd sh = mkConstr 0 (BI.mkCons sh $ BI.mkNilData unitval)
+justBdScriptHashBd sh = mkConstr 0 (BI.mkCons sh mkNil)
 
 {-# INLINEABLE getAddressBdScriptHash #-}
 getAddressBdScriptHash :: BuiltinData -> ScriptHash
