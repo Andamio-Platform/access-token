@@ -1,5 +1,6 @@
 module Index.OnChain.IndexRef.IndexData
                     ( IndexData(..)
+                    , NewIndexData(..)
                     ) where
 
 import           Prelude                as Pr  (Show, Ord(..), Eq(..))
@@ -26,3 +27,19 @@ instance PPr.Eq IndexData where
 
 PlutusTx.makeIsDataSchemaIndexed ''IndexData [('IndexData, 0)]
 PlutusTx.makeLift ''IndexData
+
+data NewIndexData = NewIndexData
+  { newTreasuryAddr         :: BuiltinData   --Address, where to send access token minting fee/stake rewards (porotcol treasury)
+  , newTreasuryDat          :: BuiltinData   -- OutputDatum, output datum as BuiltinData
+  , newMintAccessTokenValue :: [FlatValue]   -- access token minting fee value
+  , newInitGSObsSh          :: BuiltinData    -- maybe new observer script credential
+  } deriving stock (Pr.Eq, Pr.Ord, Pr.Show, Generic)
+    deriving anyclass HasBlueprintDefinition
+
+instance PPr.Eq NewIndexData where
+  {-# INLINEABLE (==) #-}
+  NewIndexData nTA nTD nMATV nIGSS == NewIndexData nTA' nTD' nMATV' nIGSS' =
+    (nTA PPr.== nTA') && (nTD PPr.== nTD') && (nMATV PPr.== nMATV') && (nIGSS PPr.== nIGSS')
+
+PlutusTx.makeIsDataSchemaIndexed ''NewIndexData [('NewIndexData, 0)]
+PlutusTx.makeLift ''NewIndexData
