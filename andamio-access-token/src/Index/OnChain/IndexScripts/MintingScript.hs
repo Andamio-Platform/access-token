@@ -26,10 +26,10 @@ import Index.OnChain.IndexRef.IndexData              (IndexData(..))
 
 {-
 Minting Validator
-Handle minting of Access Token (CIP68 NFT). 
+Handle minting of Access Token (reference NFT). 
 
 - mint exactly 3 tokens
-  - CIP68 pair
+  - reference pair
   - index token -> space as token name
 - pay fee to protocol treasury
 - one index token as input
