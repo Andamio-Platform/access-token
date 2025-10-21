@@ -11,8 +11,8 @@
 ### logic
 - exactly one token from index present
 - exactly 3 tokens with this policy minted
-    - ("100" + user name) 
-    - ("222" + user name)
+    - ("g" + user name) 
+    - ("u" + user name)
     - (" ")
 
 ## [Index Validator](src/AccessToken/OnChain/Index/IndexValidator.hs)
@@ -48,7 +48,7 @@ data IndexAction = AddIndex BuiltinByteString -- user name (new element in linke
 - new element used as redeemer for minting `indexCs` (access policy)
 - fee is paid to address with correct datum
     - data from `referenceIndexCs` (tn="IndexValidator") datum 
-- init global state observer present (logic for "100" token output)
+- init global state observer present (logic for "g" token output)
     - script hash from `referenceIndexCs` (tn="AccessPolicy") datum
 
 #### UnlockAda 

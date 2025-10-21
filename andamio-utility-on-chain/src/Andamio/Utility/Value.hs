@@ -16,8 +16,8 @@ module Andamio.Utility.Value
     , checkMinting
     , tnElemList
     , csElemList
-    , create222Tn
-    , create100Tn
+    , createUserTn
+    , createGlobalTn
     ) where
 
 import GHC.Generics (Generic)
@@ -36,13 +36,14 @@ import           PlutusTx.Builtins.Internal as BI (head, tail, BuiltinList(..), 
 import           PlutusTx.Builtins          as B  (null)
 import qualified Prelude                    as Pr (Show, Ord, Eq)
 
-{-# INLINEABLE create222Tn #-}
-create222Tn :: BuiltinByteString -> BuiltinData
-create222Tn alias = BI.mkB $ appendByteString "222" alias
 
-{-# INLINEABLE create100Tn #-}
-create100Tn :: BuiltinByteString -> BuiltinData
-create100Tn alias = BI.mkB $ appendByteString "100" alias
+{-# INLINEABLE createUserTn #-}
+createUserTn :: BuiltinByteString -> BuiltinData
+createUserTn alias = BI.mkB $ appendByteString "u" alias
+
+{-# INLINEABLE createGlobalTn #-}
+createGlobalTn :: BuiltinByteString -> BuiltinData
+createGlobalTn alias = BI.mkB $ appendByteString "g" alias
 
 {-# INLINEABLE tnElemList #-}
 tnElemList :: [TokenName] -> TokenName -> Bool
