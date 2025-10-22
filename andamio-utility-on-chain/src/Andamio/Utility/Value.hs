@@ -20,7 +20,7 @@ module Andamio.Utility.Value
     , createGlobalTn
     ) where
 
-import GHC.Generics (Generic)
+import           GHC.Generics                     (Generic)
 
 import           PlutusLedgerApi.V1.Value         (singleton)
 import           PlutusLedgerApi.V3               (CurrencySymbol (..), TokenName (..),
@@ -30,20 +30,20 @@ import           PlutusTx.Blueprint.Definition    (HasBlueprintDefinition, defin
 import           PlutusTx.Prelude                 (Eq(..), Integer, BuiltinByteString,
                                                   (&&), ($), (+), (>=), Bool(..),
                                                   error, BuiltinData, otherwise, (||))
-import           PlutusTx.Builtins.Internal as BI (head, tail, BuiltinList(..), fst, mkB, mkI,
-                                                  BuiltinPair, snd, unsafeDataAsMap, unsafeDataAsI,
-                                                  appendByteString, BuiltinInteger)
+import qualified PlutusTx.Builtins.Internal as BI (head, tail,  fst, mkB, mkI, appendByteString,
+                                                  snd, unsafeDataAsMap, unsafeDataAsI)
+import           PlutusTx.Builtins.Internal       (BuiltinInteger, BuiltinPair, BuiltinList(..))
 import           PlutusTx.Builtins          as B  (null)
 import qualified Prelude                    as Pr (Show, Ord, Eq)
 
 
 {-# INLINEABLE createUserTn #-}
 createUserTn :: BuiltinByteString -> BuiltinData
-createUserTn alias = BI.mkB $ appendByteString "u" alias
+createUserTn alias = BI.mkB $ BI.appendByteString "u" alias
 
 {-# INLINEABLE createGlobalTn #-}
 createGlobalTn :: BuiltinByteString -> BuiltinData
-createGlobalTn alias = BI.mkB $ appendByteString "g" alias
+createGlobalTn alias = BI.mkB $ BI.appendByteString "g" alias
 
 {-# INLINEABLE tnElemList #-}
 tnElemList :: [TokenName] -> TokenName -> Bool

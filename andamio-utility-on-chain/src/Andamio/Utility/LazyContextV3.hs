@@ -33,25 +33,26 @@ module Andamio.Utility.LazyContextV3
     lazyOwnCurrencySymbolBd,
     lazyScriptInfo,
     lazyScriptInfoBd,
-    unitval,
+    BI.unitval,
     constrArgs
   )
 where
 
-import           PlutusLedgerApi.V3        (Lovelace, ScriptInfo(..), CurrencySymbol (..),
-                                           TxInInfo (..),Datum (..),Credential (..),
-                                           TxOutRef(..),Value (..),POSIXTimeRange,
-                                           Redeemer (..),ProposalProcedure(..),GovernanceActionId(..),
-                                           PubKeyHash,Map,Vote,Voter,DatumHash, TxOut (..),
-                                           ScriptPurpose (..),TxId(..),TxCert(..))
-import          PlutusTx                   (BuiltinData, UnsafeFromData, unsafeFromBuiltinData)
-import          PlutusTx.Builtins.Internal (head, tail, snd, BuiltinList, unsafeDataAsConstr, unitval, 
-                                           unsafeDataAsList, BuiltinPair, unsafeDataAsMap, BuiltinInteger)
-import          PlutusTx.Prelude           (Maybe (..),(.))
+import           PlutusLedgerApi.V3               (Lovelace, ScriptInfo(..), CurrencySymbol (..),
+                                                  TxInInfo (..),Datum (..),Credential (..),
+                                                  TxOutRef(..),Value (..),POSIXTimeRange,
+                                                  Redeemer (..),ProposalProcedure(..),GovernanceActionId(..),
+                                                  PubKeyHash,Map,Vote,Voter,DatumHash, TxOut (..),
+                                                  ScriptPurpose (..),TxId(..),TxCert(..))
+import           PlutusTx                         (BuiltinData, UnsafeFromData, unsafeFromBuiltinData)
+import qualified PlutusTx.Builtins.Internal as BI (head, tail, snd, unsafeDataAsConstr, unitval,
+                                                  unsafeDataAsList, unsafeDataAsMap)
+import           PlutusTx.Builtins.Internal       (BuiltinList, BuiltinPair, BuiltinInteger)
+import           PlutusTx.Prelude                 (Maybe (..),(.))
 
 {-# INLINEABLE constrArgs #-}
 constrArgs :: BuiltinData -> BuiltinList BuiltinData
-constrArgs = snd . unsafeDataAsConstr
+constrArgs = BI.snd . BI.unsafeDataAsConstr
 
 {-# INLINEABLE getContext #-}
 getContext :: BuiltinData -> BuiltinList BuiltinData
@@ -59,15 +60,15 @@ getContext = constrArgs
 
 {-# INLINEABLE lazyRedeemer #-}
 lazyRedeemer :: BuiltinData -> BuiltinPair BuiltinInteger (BuiltinList BuiltinData)
-lazyRedeemer = unsafeDataAsConstr . head . tail . getContext
+lazyRedeemer = BI.unsafeDataAsConstr . BI.head . BI.tail . getContext
 
 {-# INLINEABLE lazyRedeemerTyped #-}
 lazyRedeemerTyped :: forall red. (UnsafeFromData red) => BuiltinData -> red
-lazyRedeemerTyped = unsafeFromBuiltinData @red . getRedeemer . unsafeFromBuiltinData . head . tail . getContext
+lazyRedeemerTyped = unsafeFromBuiltinData @red . getRedeemer . unsafeFromBuiltinData . BI.head . BI.tail . getContext
 
 {-# INLINEABLE lazyScriptInfoBd #-}
 lazyScriptInfoBd :: BuiltinData -> BuiltinData
-lazyScriptInfoBd = head . tail . tail . getContext
+lazyScriptInfoBd = BI.head . BI.tail . BI.tail . getContext
 
 {-# INLINEABLE lazyScriptInfo #-}
 lazyScriptInfo :: BuiltinData -> ScriptInfo
@@ -75,7 +76,7 @@ lazyScriptInfo = unsafeFromBuiltinData . lazyScriptInfoBd
 
 {-# INLINEABLE lazyInlineDatum #-}
 lazyInlineDatum :: BuiltinData -> BuiltinData
-lazyInlineDatum = getDatum . unsafeFromBuiltinData . head . constrArgs  . head . tail . constrArgs . lazyScriptInfoBd
+lazyInlineDatum = getDatum . unsafeFromBuiltinData . BI.head . constrArgs  . BI.head . BI.tail . constrArgs . lazyScriptInfoBd
 
 {-# INLINEABLE lazyInlineDatumTyped #-}
 lazyInlineDatumTyped :: forall dat. (UnsafeFromData dat) => BuiltinData -> dat
@@ -83,7 +84,7 @@ lazyInlineDatumTyped = unsafeFromBuiltinData @dat . lazyInlineDatum
 
 {-# INLINEABLE lazyTxOutRefBd #-}
 lazyTxOutRefBd :: BuiltinData -> BuiltinData
-lazyTxOutRefBd = head . constrArgs . lazyScriptInfoBd
+lazyTxOutRefBd = BI.head . constrArgs . lazyScriptInfoBd
 
 {-# INLINEABLE lazyTxOutRef #-}
 lazyTxOutRef :: BuiltinData -> TxOutRef
@@ -91,7 +92,7 @@ lazyTxOutRef = unsafeFromBuiltinData . lazyTxOutRefBd
 
 {-# INLINEABLE lazyOwnCurrencySymbolBd #-}
 lazyOwnCurrencySymbolBd :: BuiltinData -> BuiltinData
-lazyOwnCurrencySymbolBd = head . constrArgs . lazyScriptInfoBd
+lazyOwnCurrencySymbolBd = BI.head . constrArgs . lazyScriptInfoBd
 
 {-# INLINEABLE lazyOwnCurrencySymbol #-}
 lazyOwnCurrencySymbol :: BuiltinData -> CurrencySymbol
@@ -99,39 +100,39 @@ lazyOwnCurrencySymbol = CurrencySymbol . unsafeFromBuiltinData . lazyOwnCurrency
 
 {-# INLINEABLE lazyTxInfo #-}
 lazyTxInfo :: BuiltinData -> BuiltinList BuiltinData
-lazyTxInfo = constrArgs . head . getContext
+lazyTxInfo = constrArgs . BI.head . getContext
 
 {-# INLINEABLE lazyTxInfoInputs #-}
 lazyTxInfoInputs :: BuiltinData -> [TxInInfo]
-lazyTxInfoInputs = unsafeFromBuiltinData . head . lazyTxInfo
+lazyTxInfoInputs = unsafeFromBuiltinData . BI.head . lazyTxInfo
 
 {-# INLINEABLE lazyTxInfoInputsBd #-}
 lazyTxInfoInputsBd :: BuiltinData -> BuiltinList BuiltinData
-lazyTxInfoInputsBd = unsafeDataAsList . head . lazyTxInfo
+lazyTxInfoInputsBd = BI.unsafeDataAsList . BI.head . lazyTxInfo
 
 {-# INLINEABLE lazyTxInfoReferenceInputsBd #-}
 lazyTxInfoReferenceInputsBd :: BuiltinData -> BuiltinList BuiltinData
-lazyTxInfoReferenceInputsBd = unsafeDataAsList . head . tail . lazyTxInfo
+lazyTxInfoReferenceInputsBd = BI.unsafeDataAsList . BI.head . BI.tail . lazyTxInfo
 
 {-# INLINEABLE lazyTxInfoReferenceInputs #-}
 lazyTxInfoReferenceInputs :: BuiltinData -> [TxInInfo]
-lazyTxInfoReferenceInputs = unsafeFromBuiltinData . head . tail . lazyTxInfo
+lazyTxInfoReferenceInputs = unsafeFromBuiltinData . BI.head . BI.tail . lazyTxInfo
 
 {-# INLINEABLE lazyTxInfoOutputs #-}
 lazyTxInfoOutputs :: BuiltinData -> [TxOut]
-lazyTxInfoOutputs = unsafeFromBuiltinData . head . tail . tail . lazyTxInfo
+lazyTxInfoOutputs = unsafeFromBuiltinData . BI.head . BI.tail . BI.tail . lazyTxInfo
 
 {-# INLINEABLE lazyTxInfoOutputsBd #-}
 lazyTxInfoOutputsBd :: BuiltinData -> BuiltinList BuiltinData
-lazyTxInfoOutputsBd = unsafeDataAsList . head . tail . tail . lazyTxInfo
+lazyTxInfoOutputsBd = BI.unsafeDataAsList . BI.head . BI.tail . BI.tail . lazyTxInfo
 
 {-# INLINEABLE lazyTxInfoFee #-}
 lazyTxInfoFee :: BuiltinData -> Lovelace
-lazyTxInfoFee = unsafeFromBuiltinData . head . tail . tail . tail . lazyTxInfo
+lazyTxInfoFee = unsafeFromBuiltinData . BI.head . BI.tail . BI.tail . BI.tail . lazyTxInfo
 
 {-# INLINEABLE lazyTxInfoMintBd #-}
 lazyTxInfoMintBd :: BuiltinData -> BuiltinData
-lazyTxInfoMintBd = head . tail . tail . tail . tail . lazyTxInfo
+lazyTxInfoMintBd = BI.head . BI.tail . BI.tail . BI.tail . BI.tail . lazyTxInfo
 
 {-# INLINEABLE lazyTxInfoMint #-}
 lazyTxInfoMint :: BuiltinData -> Value
@@ -140,62 +141,62 @@ lazyTxInfoMint = unsafeFromBuiltinData . lazyTxInfoMintBd
 {-# INLINEABLE lazyTxInfoTxCerts #-}
 lazyTxInfoTxCerts :: BuiltinData -> [TxCert]
 lazyTxInfoTxCerts =
-  unsafeFromBuiltinData . head . tail . tail . tail . tail . tail . lazyTxInfo
+  unsafeFromBuiltinData . BI.head . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . lazyTxInfo
 
 {-# INLINEABLE lazyTxInfoWdrl #-}
 lazyTxInfoWdrl :: BuiltinData -> Map Credential Lovelace
 lazyTxInfoWdrl =
-  unsafeFromBuiltinData . head . tail . tail . tail . tail . tail . tail . lazyTxInfo
+  unsafeFromBuiltinData . BI.head . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . lazyTxInfo
 
 {-# INLINEABLE lazyTxInfoWdrlBd #-}
 lazyTxInfoWdrlBd :: BuiltinData -> BuiltinList (BuiltinPair BuiltinData BuiltinData)
-lazyTxInfoWdrlBd = unsafeDataAsMap . head . tail . tail . tail . tail . tail . tail . lazyTxInfo
+lazyTxInfoWdrlBd = BI.unsafeDataAsMap . BI.head . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . lazyTxInfo
 
 {-# INLINEABLE lazyTxInfoValidRange #-}
 lazyTxInfoValidRange :: BuiltinData -> POSIXTimeRange
 lazyTxInfoValidRange =
-  unsafeFromBuiltinData . head . tail . tail . tail . tail . tail . tail . tail . lazyTxInfo
+  unsafeFromBuiltinData . BI.head . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . lazyTxInfo
 
 {-# INLINEABLE lazyTxInfoSignatories #-}
 lazyTxInfoSignatories :: BuiltinData -> [PubKeyHash]
 lazyTxInfoSignatories =
-  unsafeFromBuiltinData . head . tail . tail . tail . tail . tail . tail . tail . tail . lazyTxInfo
+  unsafeFromBuiltinData . BI.head . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . lazyTxInfo
 
 {-# INLINEABLE lazyTxInfoRedeemers #-}
 lazyTxInfoRedeemers :: BuiltinData -> Map ScriptPurpose Redeemer
 lazyTxInfoRedeemers =
-  unsafeFromBuiltinData . head . tail . tail . tail . tail . tail . tail . tail . tail . tail . lazyTxInfo
+  unsafeFromBuiltinData . BI.head . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . lazyTxInfo
 
 {-# INLINEABLE lazyTxInfoRedeemersBd #-}
 lazyTxInfoRedeemersBd :: BuiltinData -> BuiltinList (BuiltinPair BuiltinData BuiltinData)
-lazyTxInfoRedeemersBd = unsafeDataAsMap . head . tail . tail . tail . tail . tail . tail . tail . tail . tail . lazyTxInfo
+lazyTxInfoRedeemersBd = BI.unsafeDataAsMap . BI.head . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . lazyTxInfo
 
 {-# INLINEABLE lazyTxInfoData #-}
 lazyTxInfoData :: BuiltinData -> Map DatumHash Datum
 lazyTxInfoData =
-  unsafeFromBuiltinData . head . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . lazyTxInfo
+  unsafeFromBuiltinData . BI.head . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . lazyTxInfo
 
 {-# INLINEABLE lazyTxInfoId #-}
 lazyTxInfoId :: BuiltinData -> TxId
 lazyTxInfoId =
-  unsafeFromBuiltinData . head . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . lazyTxInfo
+  unsafeFromBuiltinData . BI.head . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . lazyTxInfo
 
 {-# INLINEABLE lazyTxInfoVotes #-}
 lazyTxInfoVotes :: BuiltinData -> Map Voter (Map GovernanceActionId Vote)
 lazyTxInfoVotes =
-  unsafeFromBuiltinData . head . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . lazyTxInfo
+  unsafeFromBuiltinData . BI.head . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . lazyTxInfo
 
 {-# INLINEABLE lazyTxInfoProposalProcedures #-}
 lazyTxInfoProposalProcedures :: BuiltinData -> [ProposalProcedure]
 lazyTxInfoProposalProcedures =
-  unsafeFromBuiltinData . head . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . lazyTxInfo
+  unsafeFromBuiltinData . BI.head . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . lazyTxInfo
 
 {-# INLINEABLE lazyTxInfoCurrentTreasuryAmount #-}
 lazyTxInfoCurrentTreasuryAmount :: BuiltinData -> Maybe Lovelace
 lazyTxInfoCurrentTreasuryAmount =
-  unsafeFromBuiltinData . head . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . lazyTxInfo
+  unsafeFromBuiltinData . BI.head . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . lazyTxInfo
 
 {-# INLINEABLE lazyTxInfoTreasuryDonation #-}
 lazyTxInfoTreasuryDonation :: BuiltinData -> Maybe Lovelace
 lazyTxInfoTreasuryDonation =
-  unsafeFromBuiltinData . head . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . tail . lazyTxInfo
+  unsafeFromBuiltinData . BI.head . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . BI.tail . lazyTxInfo

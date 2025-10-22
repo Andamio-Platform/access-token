@@ -10,9 +10,9 @@ import           PlutusTx                          (compile, CompiledCode)
 import           PlutusTx.Prelude           as PPr (BuiltinUnit, BuiltinData, Bool(..), 
                                                    ($), otherwise, error, (==))
 
-import           PlutusTx.Builtins.Internal as BI  (head, BuiltinList(..), unsafeDataAsConstr,
-                                                   snd, fst, BuiltinPair, BuiltinInteger,
+import qualified PlutusTx.Builtins.Internal as BI  (head,  unsafeDataAsConstr, snd, fst,
                                                    unsafeDataAsB)
+import           PlutusTx.Builtins.Internal        (BuiltinPair, BuiltinInteger, BuiltinList(..))
 
 import           Andamio.Utility.OnChain           (lazyRedeemerTyped, indexScriptsOnChainName, 
                                                    unitval, indexTokenName, indexScriptsOnChainNameBd,

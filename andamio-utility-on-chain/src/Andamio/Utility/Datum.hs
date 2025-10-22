@@ -7,8 +7,8 @@ module Andamio.Utility.Datum
 import PlutusTx.Prelude                    (error)
 import PlutusLedgerApi.V3                  (OutputDatum(..), Datum(..), BuiltinData, 
                                            UnsafeFromData, unsafeFromBuiltinData)
-import PlutusTx.Builtins.Internal    as BI (mkConstr, mkCons)
-import PlutusTx.Builtins.HasOpaque         (mkNil)
+import PlutusTx.Builtins.Internal as BI (mkConstr, mkCons)
+import PlutusTx.Builtins.HasOpaque      (mkNil)
 
 {-# INLINEABLE getTxOutInlineDatumTyped #-}
 getTxOutInlineDatumTyped :: forall dat. (UnsafeFromData dat) => OutputDatum -> dat

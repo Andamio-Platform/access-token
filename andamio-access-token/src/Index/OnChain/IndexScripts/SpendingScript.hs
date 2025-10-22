@@ -3,12 +3,12 @@ module Index.OnChain.IndexScripts.SpendingScript
                     ) where
 
 
-import PlutusTx.Prelude                 (BuiltinData, Integer, Bool(..),
-                                        (==), (+), ($), otherwise)
-import PlutusTx.Builtins.Internal as BI (head, tail, BuiltinList(..), BuiltinPair(..), 
-                                        mkConstr, mkCons, fst)
-import PlutusTx.Builtins          as B  (null)
-import PlutusTx.Builtins.HasOpaque      (mkNil)
+import           PlutusTx.Prelude                  (BuiltinData, Integer, Bool(..),
+                                                   (==), (+), ($), otherwise)
+import qualified PlutusTx.Builtins.Internal  as BI (head, tail, mkConstr, mkCons, fst)
+import           PlutusTx.Builtins.Internal        (BuiltinList(..), BuiltinPair(..))
+import           PlutusTx.Builtins           as B  (null)
+import           PlutusTx.Builtins.HasOpaque       (mkNil)
 
 {-
 Spending Validator

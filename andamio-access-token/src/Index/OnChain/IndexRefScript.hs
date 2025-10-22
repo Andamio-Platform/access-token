@@ -10,7 +10,8 @@ import           PlutusLedgerApi.V3                (unsafeFromBuiltinData, Outpu
 import           PlutusTx                          (compile, CompiledCode)     
 import           PlutusTx.Prelude                  (BuiltinUnit, BuiltinData, Bool(..), error,
                                                    otherwise, ($), (==), (&&), (>))
-import           PlutusTx.Builtins.Internal  as BI (head, tail, BuiltinList(..), unsafeDataAsConstr, snd, fst)
+import qualified PlutusTx.Builtins.Internal  as BI (head, tail, unsafeDataAsConstr, snd, fst)
+import           PlutusTx.Builtins.Internal        (BuiltinList(..))
 import           PlutusTx.Builtins           as B  (null)
 
 import           Andamio.Utility.OnChain           (lazyRedeemerTyped, singleTokenInValueBd,
@@ -65,7 +66,7 @@ mkValidator IndexRefParams{..} newIndexData ownInput dat txInfoOutputsBd =
               -- if just new init obs then is Script Credential
               newObsList :: [BuiltinData]
               newObsList
-                | fst constr == 0 && isScriptCred (unsafeFromBuiltinData $ BI.head $ BI.snd constr) = (BI.head $ BI.snd constr):initGSObsShList dat
+                | BI.fst constr == 0 && isScriptCred (unsafeFromBuiltinData $ BI.head $ BI.snd constr) = (BI.head $ BI.snd constr):initGSObsShList dat
                 | otherwise = initGSObsShList dat
                 where
 
