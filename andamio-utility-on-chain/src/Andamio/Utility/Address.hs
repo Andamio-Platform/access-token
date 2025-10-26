@@ -8,12 +8,12 @@ module Andamio.Utility.Address
     , getAddressBdScriptHashBd
     ) where
 
-import PlutusTx.Prelude                    (($), (.))
-import PlutusLedgerApi.V3                  (ScriptHash(..), BuiltinData, 
-                                           toBuiltinData, unsafeFromBuiltinData)
-import PlutusTx.Builtins.Internal    as BI (mkConstr, mkCons, head)
-import PlutusTx.Builtins.HasOpaque         (mkNil)
-import Andamio.Utility.LazyContextV3       (constrArgs)
+import           PlutusTx.Prelude                    (($), (.))
+import           PlutusLedgerApi.V3                  (ScriptHash(..), BuiltinData,
+                                                     toBuiltinData, unsafeFromBuiltinData)
+import qualified PlutusTx.Builtins.Internal    as BI (mkConstr, mkCons, head)
+import           PlutusTx.Builtins.HasOpaque         (mkNil)
+import           Andamio.Utility.LazyContextV3       (constrArgs)
 
 {-# INLINEABLE scriptCredFromScrHash #-}
 scriptCredFromScrHash :: ScriptHash -> BuiltinData
@@ -33,16 +33,16 @@ stakingScriptBdCredFromScriptCredBd sh = BI.mkConstr 0 $ BI.mkCons (BI.mkConstr 
 
 {-# INLINEABLE justScriptHashBd #-}
 justScriptHashBd :: ScriptHash -> BuiltinData
-justScriptHashBd sh = mkConstr 0 (BI.mkCons (toBuiltinData sh) mkNil)
+justScriptHashBd sh = BI.mkConstr 0 (BI.mkCons (toBuiltinData sh) mkNil)
 
 {-# INLINEABLE justBdScriptHashBd #-}
 justBdScriptHashBd :: BuiltinData -> BuiltinData
-justBdScriptHashBd sh = mkConstr 0 (BI.mkCons sh mkNil)
+justBdScriptHashBd sh = BI.mkConstr 0 (BI.mkCons sh mkNil)
 
 {-# INLINEABLE getAddressBdScriptHash #-}
 getAddressBdScriptHash :: BuiltinData -> ScriptHash
-getAddressBdScriptHash = unsafeFromBuiltinData . head . constrArgs . head . constrArgs
+getAddressBdScriptHash = unsafeFromBuiltinData . BI.head . constrArgs . BI.head . constrArgs
 
 {-# INLINEABLE getAddressBdScriptHashBd #-}
 getAddressBdScriptHashBd :: BuiltinData -> BuiltinData
-getAddressBdScriptHashBd = head . constrArgs . head . constrArgs
+getAddressBdScriptHashBd = BI.head . constrArgs . BI.head . constrArgs

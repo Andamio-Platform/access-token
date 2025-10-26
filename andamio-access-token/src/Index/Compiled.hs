@@ -9,7 +9,7 @@ import Data.Set as Set
 import Index.OnChain.IndexScripts      (IndexParams(..), indexValidatorCompiledCode)
 import Index.OnChain.InitIndexPolicy   (initIndexPolicyCompiledCode)
 import Index.OnChain.IndexRefScript    (IndexRefParams(..), indexRefValidatorCompiledCode, 
-                                       IndexData(..))
+                                       IndexData(..), NewIndexData(..))
 import Andamio.Utility.OnChain         (FlatValue(..))
 import PlutusTx.Blueprint
 import PlutusTx.Prelude
@@ -31,6 +31,7 @@ indexContractBlueprint =
            , IndexRefParams
            , BuiltinData
            , IndexData
+           , NewIndexData
            , FlatValue
            ]
     }

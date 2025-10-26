@@ -8,17 +8,18 @@ module Andamio.Utility.BuiltinByteString
     , bdElemList
     ) where
 
-import PlutusTx.Prelude              (Integer, (+), (++), appendByteString,
-                                     Bool(..), (==), otherwise, (||), (&&))
-import PlutusLedgerApi.V3            (BuiltinByteString, BuiltinData)
-import PlutusTx.Builtins.Internal    (head, BuiltinList, tail)
-import PlutusTx.Builtins             (null)
+import           PlutusTx.Prelude                 (Integer, (+), (++), appendByteString,
+                                                  Bool(..), (==), otherwise, (||), (&&))
+import           PlutusLedgerApi.V3               (BuiltinByteString, BuiltinData)
+import qualified PlutusTx.Builtins.Internal as BI (head, tail)
+import           PlutusTx.Builtins.Internal       (BuiltinList)
+import           PlutusTx.Builtins                (null)
 
 {-# INLINEABLE bdElemList #-}
 bdElemList :: BuiltinList BuiltinData -> BuiltinData -> Bool
 bdElemList bdList bd
   | null bdList = False
-  | otherwise = (head bdList == bd) || bdElemList (tail bdList) bd
+  | otherwise = (BI.head bdList == bd) || bdElemList (BI.tail bdList) bd
 
 {-# INLINEABLE filterNotElem #-}
 filterNotElem :: [BuiltinByteString] -> [BuiltinByteString] -> [BuiltinByteString] -> [BuiltinByteString]

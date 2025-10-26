@@ -3,14 +3,14 @@ module Index.OnChain.IndexScripts.MintingScript
                     ) where
 
 
-import PlutusLedgerApi.V3                            (unsafeFromBuiltinData, toBuiltinData)
-import PlutusTx.Prelude                       as PPr (Integer, Bool(..), fst, snd, BuiltinByteString, 
+import           PlutusLedgerApi.V3                  (unsafeFromBuiltinData, toBuiltinData)
+import           PlutusTx.Prelude             as PPr (fst, snd, BuiltinData, BuiltinByteString,
                                                      (+), (==), otherwise, (&&), ($), error, 
-                                                     (||), (<), BuiltinData)
-import PlutusTx.Builtins.Internal             as BI  (head, tail, BuiltinList(..), BuiltinPair, 
-                                                     unsafeDataAsMap, mkI, mkCons)
-import PlutusTx.Builtins                      as B   (null)
-import PlutusTx.Builtins.HasOpaque                   (mkNil)
+                                                     (||), (<), Integer, Bool(..))
+import qualified PlutusTx.Builtins.Internal   as BI  (head, tail, unsafeDataAsMap, mkI, mkCons)
+import           PlutusTx.Builtins.Internal          (BuiltinList(..), BuiltinPair)
+import           PlutusTx.Builtins            as B   (null)
+import           PlutusTx.Builtins.HasOpaque         (mkNil)
 
 import Andamio.Utility.OnChain                       (indexTokenNameBd, lazyTxInInfoTxOutInlineDatBd,
                                                      lazyTxOutDatumBd, tnAmBdMapByCsFromValueBd,
@@ -65,7 +65,7 @@ mkMintingScript IndexParams{..} indexData newElement ownSymbolBd txInfoMintBd tx
           | B.null txInInfosBd = if B.null (BI.tail ins) 
                                  then unsafeFromBuiltinData $ lazyTxInInfoTxOutInlineDatBd (BI.head ins)
                                  else error ()
-          | oneTokenInValue (lazyTxInInfoValueMapBd $ BI.head txInInfosBd) = filterTxInInfoByTokenDatumBd (BI.tail txInInfosBd) (mkCons (BI.head txInInfosBd) ins)
+          | oneTokenInValue (lazyTxInInfoValueMapBd $ BI.head txInInfosBd) = filterTxInInfoByTokenDatumBd (BI.tail txInInfosBd) (BI.mkCons (BI.head txInInfosBd) ins)
           | otherwise = filterTxInInfoByTokenDatumBd (BI.tail txInInfosBd) ins
 
         -- either boarder token or own symbol

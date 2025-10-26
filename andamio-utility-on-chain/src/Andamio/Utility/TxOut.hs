@@ -13,25 +13,25 @@ module Andamio.Utility.TxOut
     , findLazyTxOutBySingleToken
     ) where
 
-import           PlutusTx.Prelude              (Bool(..), ($), otherwise, error, (==), (.))
-import           PlutusLedgerApi.V3            (Value(..), unsafeFromBuiltinData)
-import           PlutusTx.Builtins.Internal    (BuiltinList, BuiltinData, BuiltinPair, tail, 
-                                               head, unsafeDataAsMap)
-import           PlutusTx.Builtins             (null)
-import           Andamio.Utility.Value         (singleTokenInValueBd, csElem)
-import           Andamio.Utility.LazyContextV3 (constrArgs)
+import           PlutusTx.Prelude                    (Bool(..), ($), otherwise, error, (==), (.))
+import           PlutusLedgerApi.V3                  (Value(..), unsafeFromBuiltinData)
+import qualified PlutusTx.Builtins.Internal    as BI (tail, head, unsafeDataAsMap)
+import           PlutusTx.Builtins.Internal          (BuiltinList, BuiltinData, BuiltinPair)
+import           PlutusTx.Builtins                   (null)
+import           Andamio.Utility.Value               (singleTokenInValueBd, csElem)
+import           Andamio.Utility.LazyContextV3       (constrArgs)
 
 {-# INLINEABLE lazyTxOutAddrBd #-}
 lazyTxOutAddrBd :: BuiltinData -> BuiltinData
-lazyTxOutAddrBd = head . constrArgs
+lazyTxOutAddrBd = BI.head . constrArgs
 
 {-# INLINEABLE lazyTxOutValueBd #-}
 lazyTxOutValueBd :: BuiltinData -> BuiltinData
-lazyTxOutValueBd = head . tail . constrArgs
+lazyTxOutValueBd = BI.head . BI.tail . constrArgs
 
 {-# INLINEABLE lazyTxOutValueMapBd #-}
 lazyTxOutValueMapBd :: BuiltinData -> BuiltinList (BuiltinPair BuiltinData BuiltinData)
-lazyTxOutValueMapBd = unsafeDataAsMap . lazyTxOutValueBd
+lazyTxOutValueMapBd = BI.unsafeDataAsMap . lazyTxOutValueBd
 
 {-# INLINEABLE lazyTxOutValue #-}
 lazyTxOutValue :: BuiltinData -> Value
@@ -39,43 +39,43 @@ lazyTxOutValue = unsafeFromBuiltinData . lazyTxOutValueBd
 
 {-# INLINEABLE lazyTxOutDatumBd #-}
 lazyTxOutDatumBd :: BuiltinData -> BuiltinData
-lazyTxOutDatumBd = head . tail . tail . constrArgs
+lazyTxOutDatumBd = BI.head . BI.tail . BI.tail . constrArgs
 
 {-# INLINEABLE lazyTxOutInlineDatBd #-}
 lazyTxOutInlineDatBd :: BuiltinData -> BuiltinData
-lazyTxOutInlineDatBd = head . constrArgs . lazyTxOutDatumBd
+lazyTxOutInlineDatBd = BI.head . constrArgs . lazyTxOutDatumBd
 
 {-# INLINEABLE lazyTxOutReferenceScriptBd #-}
 lazyTxOutReferenceScriptBd :: BuiltinData -> BuiltinData
-lazyTxOutReferenceScriptBd = head . tail . tail . tail . constrArgs
+lazyTxOutReferenceScriptBd = BI.head . BI.tail . BI.tail . BI.tail . constrArgs
 
 {-# INLINEABLE csInTxOutsBd #-}
 csInTxOutsBd :: BuiltinList BuiltinData -> BuiltinData -> Bool
 csInTxOutsBd bdList cs 
   | null bdList = False
-  | csElem (lazyTxOutValueMapBd $ head bdList) cs = True
-  | otherwise = csInTxOutsBd (tail bdList) cs
+  | csElem (lazyTxOutValueMapBd $ BI.head bdList) cs = True
+  | otherwise = csInTxOutsBd (BI.tail bdList) cs
 
 {-# INLINEABLE findLazyTxOutByCs #-}
 findLazyTxOutByCs :: BuiltinList BuiltinData -> BuiltinData -> BuiltinData
 findLazyTxOutByCs txOutsBd cs
   | null txOutsBd = error ()
-  | csElem (lazyTxOutValueMapBd $ head txOutsBd) cs = head txOutsBd
-  | otherwise = findLazyTxOutByCs (tail txOutsBd) cs
+  | csElem (lazyTxOutValueMapBd $ BI.head txOutsBd) cs = BI.head txOutsBd
+  | otherwise = findLazyTxOutByCs (BI.tail txOutsBd) cs
 
 {-# INLINEABLE findLazyTxOutByAddr #-}
 findLazyTxOutByAddr :: BuiltinList BuiltinData -> BuiltinData -> BuiltinData
 findLazyTxOutByAddr txOutsBd addr
   | null txOutsBd = error ()
-  | lazyTxOutAddrBd (head txOutsBd) == addr = head txOutsBd
-  | otherwise = findLazyTxOutByAddr (tail txOutsBd) addr
+  | lazyTxOutAddrBd (BI.head txOutsBd) == addr = BI.head txOutsBd
+  | otherwise = findLazyTxOutByAddr (BI.tail txOutsBd) addr
 
 {-# INLINEABLE findLazyTxOutBySingleToken #-}
 findLazyTxOutBySingleToken :: BuiltinList BuiltinData -> BuiltinData -> BuiltinData -> BuiltinData
 findLazyTxOutBySingleToken txOutsBd cs tn
   | null txOutsBd = error ()
-  | singleTokenInValueBd (lazyTxOutValueMapBd $ head txOutsBd) cs tn = head txOutsBd
-  | otherwise = findLazyTxOutBySingleToken (tail txOutsBd) cs tn
+  | singleTokenInValueBd (lazyTxOutValueMapBd $ BI.head txOutsBd) cs tn = BI.head txOutsBd
+  | otherwise = findLazyTxOutBySingleToken (BI.tail txOutsBd) cs tn
 
 {-# INLINEABLE findLazyTxOutBySingleTokenToAddrBd #-}
 findLazyTxOutBySingleTokenToAddrBd :: BuiltinList BuiltinData -> BuiltinData -> BuiltinData -> BuiltinData

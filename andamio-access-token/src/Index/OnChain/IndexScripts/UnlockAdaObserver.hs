@@ -3,19 +3,20 @@ module Index.OnChain.IndexScripts.UnlockAdaObserver
                     ) where
 
 
-import PlutusTx.Prelude                       as PPr (Bool(..), Integer, BuiltinData, BuiltinByteString,
-                                                     (||), (+), ($), (==), (&&), otherwise,
-                                                     (-), (>=), error, (<))
+import           PlutusTx.Prelude            as PPr (Bool(..), Integer, BuiltinData, BuiltinByteString,
+                                                    (||), (+), ($), (==), (&&), otherwise,
+                                                    (-), (>=), error, (<))
+import           PlutusTx.Builtins           as B   (null)
+import qualified PlutusTx.Builtins.Internal  as BI  (head, tail, mkCons, mkB)
+import           PlutusTx.Builtins.Internal  as BI  (BuiltinList(..), BuiltinPair)
+import           PlutusTx.Builtins.HasOpaque        (mkNil)
 
-import PlutusTx.Builtins                      as B   (null)
+
 import Andamio.Utility.OnChain                       (singleTokenInValueBd, valueOfBd, lazyTxOutValueMapBd,
                                                      lazyTxOutAddrBd, constrArgs, indexTokenNameBd,
                                                      lazyTxOutReferenceScriptBd, lazyTxOutDatumBd, lengthListTupleBd,
                                                      nothingBd, adaTokenBd, adaSymbolBd, tupleElemOnlyOne,
                                                      lazyTxInInfoValueMapBd, addressFromScriptHashesBd)
-import PlutusTx.Builtins.Internal             as BI  (head, tail, BuiltinList(..), mkCons, mkB, BuiltinPair)
-import PlutusTx.Builtins.HasOpaque                   (mkNil)
-
 
 import Index.OnChain.IndexScripts.IndexParams        (IndexParams(..))
 import Index.OnChain.IndexRef.IndexData              (IndexData(..))
@@ -79,7 +80,7 @@ mkUnlockAdaObserver IndexParams{..} indexData ownBbs txInfoOutputs txInfoInputs 
             go :: BuiltinList BuiltinData -> BuiltinList BuiltinData -> BuiltinList BuiltinData
             go bdList counter
               | B.null bdList = counter  
-              | oneOf (lazyTxInInfoValueMapBd $ BI.head bdList) = go (BI.tail bdList) (mkCons (BI.head $ BI.tail $ constrArgs $ BI.head bdList) counter)
+              | oneOf (lazyTxInInfoValueMapBd $ BI.head bdList) = go (BI.tail bdList) (BI.mkCons (BI.head $ BI.tail $ constrArgs $ BI.head bdList) counter)
               | otherwise = go (BI.tail bdList) counter
 
         -- outputs back to index
@@ -92,7 +93,7 @@ mkUnlockAdaObserver IndexParams{..} indexData ownBbs txInfoOutputs txInfoInputs 
               | lazyTxOutAddrBd (BI.head bdList) == addressFromScriptHashesBd (BI.mkB ownBbs) stakingScrHash &&
                 oneOf (lazyTxOutValueMapBd $ BI.head bdList) &&
                 tupleElemOnlyOne (lazyTxOutValueMapBd $ BI.head bdList) 0 == 2 &&
-                lazyTxOutReferenceScriptBd (BI.head bdList) == nothingBd = go (BI.tail bdList) (mkCons (BI.head bdList) counter)
+                lazyTxOutReferenceScriptBd (BI.head bdList) == nothingBd = go (BI.tail bdList) (BI.mkCons (BI.head bdList) counter)
               | otherwise = go (BI.tail bdList) counter
 
         -- either boarder or own token
