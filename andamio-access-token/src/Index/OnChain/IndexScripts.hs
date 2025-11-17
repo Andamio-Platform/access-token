@@ -11,7 +11,7 @@ import           PlutusTx.Prelude           as PPr (BuiltinUnit, BuiltinData, Bo
                                                    ($), otherwise, error, (==))
 
 import qualified PlutusTx.Builtins.Internal as BI  (head,  unsafeDataAsConstr, snd, fst,
-                                                   unsafeDataAsB)
+                                                   unsafeDataAsB, tail)
 import           PlutusTx.Builtins.Internal        (BuiltinPair, BuiltinInteger, BuiltinList(..))
 
 import           Andamio.Utility.OnChain           (lazyRedeemerTyped, indexScriptsOnChainName, 
@@ -41,7 +41,7 @@ untypedValidator params ctx'
       | BI.fst scrInfoBd == 0 = mkMintingScript params (getIndexData $ lazyTxInfoReferenceInputsBd ctx') (lazyRedeemerTyped ctx') (BI.head $ BI.snd scrInfoBd) (lazyTxInfoMintBd ctx') (lazyTxInfoInputsBd ctx') (lazyTxInfoOutputsBd ctx') (lazyTxInfoWdrlBd ctx')
       | BI.fst scrInfoBd == 1 = mkSpendingValidator (findLazyTxInInfoByTxOutRefToAddrPkhBd (lazyTxInfoInputsBd ctx') (BI.head $ BI.snd scrInfoBd)) (lazyTxInfoRedeemersBd ctx') 0
       | BI.fst scrInfoBd == 2 = mkUnlockAdaObserver params (getIndexData $ lazyTxInfoReferenceInputsBd ctx')  (BI.unsafeDataAsB $ BI.head $ constrArgs $ BI.head $ BI.snd scrInfoBd) (lazyTxInfoOutputsBd ctx') (lazyTxInfoInputsBd ctx')
-      | BI.fst scrInfoBd == 3 = True
+      | BI.fst scrInfoBd == 3 = BI.fst (BI.unsafeDataAsConstr $ BI.head $ BI.tail $ BI.snd scrInfoBd) == 0
       | otherwise = error ()
 
     getIndexData :: BuiltinList BuiltinData -> IndexData
