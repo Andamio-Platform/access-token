@@ -11,6 +11,7 @@ import PlutusTx.Prelude                  (blake2b_224)
 
 import Andamio.Utility.Value
 import Andamio.Utility.Test
+import Andamio.Utility.ValidatorOnChainNames (adaSymbolBd, adaTokenBd)
 
 tests :: TestTree
 tests = testGroup "Value" 
@@ -98,5 +99,13 @@ tests = testGroup "Value"
                   let val = mconcat $ map createValue ["2", "3"]
                       flatVal = [FlatValue (createCs "2") (TokenName "2") 1, FlatValue (createCs "3") (TokenName "3") 1]
 
-                  assertBool "flatValueToValue" (flatValueToValue flatVal (Value Map.empty) == val)
+                  assertBool "flatValueToValue" (flatValueToValue flatVal (Value Map.empty) == val),
+                
+                testCaseSteps "Match ADA AssetClass" $ \_ -> do
+  
+                  let correctSymbol = V3.unsafeFromBuiltinData adaSymbolBd == V3.adaSymbol
+                  let correctName = V3.unsafeFromBuiltinData adaTokenBd == V3.adaToken
+
+                  assertBool "Unmatched ADA Symbol" correctSymbol
+                  assertBool "Unmatched ADA Name" correctName
               ]
