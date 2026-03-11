@@ -1,7 +1,7 @@
 cabal-version:      3.8
 name:               andamio-access-token
 maintainer:         andamio.io
-version:            0.1.0.0
+version:            2.0.0
 build-type:         Simple
 synopsis:           A Haskell/Plutus project to index unique token names in a linked on chain list.
 

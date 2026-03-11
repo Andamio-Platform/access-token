@@ -1,8 +1,18 @@
-
-
 # andamio-access-token
 
-## [Access Policy](src/AccessToken/OnChain/Index/AccessPolicy.hs)
+## Audit
+
+This codebase was audited by [TxPipe](https://txpipe.io) (December 31st, 2025). The full report is available at [audits/TxPipe.pdf](audits/TxPipe.pdf).
+
+6 findings were identified. 5 are resolved. 1 is acknowledged but not fixed:
+
+**AND-202 (Minor)** — Missing checks in the `IndexData` fields related to the treasury fees output. The `treasuryAddr`, `mintAccessTokenValue`, and `treasuryDatum` fields are not validated against ledger rules on-chain. The impact depends on the field: a misconfigured `treasuryAddr` or `treasuryDatum` would only affect fee collection — minting access tokens would still work, the fee receiver simply would not receive the fees correctly. Only a misconfigured `mintAccessTokenValue` containing no ADA could cause a temporary freeze of minting, as the ledger requires ADA in outputs. In all cases no funds are at risk and the issue is resolvable by the admin submitting a corrective update.
+
+The decision not to enforce these checks on-chain was intentional. Updates to `IndexData` are gated by the presence of an admin NFT (`irppMasterAdmin`). That NFT can be held in a simple wallet (currently a multisig) or locked at a validator — and it is that validator which can enforce any additional rules. This design keeps the core contract flexible and future-proof: stricter validation can be introduced at any time by moving the admin NFT into a dedicated validator, without changing the audited contracts. See the audit report (section 5.d) for full details.
+
+
+
+## [Access Policy](andamio-access-token/src/Index/OnChain/IndexScripts/MintingScript.hs)
 
 `mkPolicy :: CurrencySymbol -> BuiltinByteString -> ScriptContext -> Bool`
 - `CurrencySymbol` = init index policy id, boarders of the link list
@@ -15,7 +25,7 @@
     - ("u" + user name)
     - (" ")
 
-## [Index Validator](src/AccessToken/OnChain/Index/IndexValidator.hs)
+## [Index Validator](andamio-access-token/src/Index/OnChain/IndexScripts/SpendingScript.hs)
 
 `mkValidator :: IndexParams -> IndexDatum -> IndexAction -> ScriptContext -> Bool`
 
@@ -54,7 +64,7 @@ data IndexAction = AddIndex BuiltinByteString -- user name (new element in linke
 #### UnlockAda 
 - `unlockScrHash` = stake validator observer with logic for unlocking ada but not tokens 
 
-## [Init Index Policy](src/AccessToken/OnChain/Index/AccessPolicy.hs)
+## [Init Index Policy](andamio-access-token/src/Index/OnChain/InitIndexPolicy.hs)
 
 `mkPolicy :: TxOutRef -> () -> ScriptContext -> Bool`
 - `TxOutRef` = consume for uniqueness
@@ -63,7 +73,7 @@ data IndexAction = AddIndex BuiltinByteString -- user name (new element in linke
 - exactly two tokens with " " as token name minted
 - tx out ref consumed 
 
-## [Unlock Ada Observer](src/AccessToken/OnChain/Index/UnlockAdaObserver.hs)
+## [Unlock Ada Observer](andamio-access-token/src/Index/OnChain/IndexScripts/UnlockAdaObserver.hs)
 
 `mkStakingValidator :: UnlockAdaObserverParams -> () -> ScriptContext -> Bool`
 
@@ -85,7 +95,7 @@ data UnlockAdaObserverParams = UnlockAdaObserverParams
 - difference between input and output ada is send to treasury address with correct datum
     - data from `uaopReferenceIndexCs` (tn="IndexValidator") datum
 
-## [Index Reference Policy](src/AccessToken/OnChain/IndexRefParams/ParamsPolicy.hs)
+## [Index Reference Policy](andamio-access-token/src/Index/OnChain/IndexRefScript.hs)
 
 `mkPolicy :: TxOutRef -> () -> ScriptContext -> Bool`
 - `TxOutRef` = consume for uniqueness
@@ -97,7 +107,7 @@ data UnlockAdaObserverParams = UnlockAdaObserverParams
   - "IndexValidator"
   - "IndexStaking"
 
-## [Index Reference Validator](src/AccessToken/OnChain/IndexRefParams/ParamsRefValidator.hs)
+## [Index Reference Validator](andamio-access-token/src/Index/OnChain/IndexRef/IndexRefParams.hs)
 
 `mkValidator :: IndexRefParamsParams -> IndexRefParamsDatum -> IndexRefParamsAction -> ScriptContext -> Bool`
 
@@ -150,3 +160,25 @@ data IndexRefParamsAction = AddAccessPolicy ScriptHash -- add init global observ
 - (tn=IndexStaking) own in and output
 - reference script (Index Validator) in own output
 - pool id changed
+
+## Build
+
+Requires GHC 9.6.x and Cabal 3.8+.
+
+To build:
+
+```bash
+cabal build all
+```
+
+To run tests:
+
+```bash
+cabal test all
+```
+
+To generate the compiled blueprint:
+
+```bash
+cabal run write-blueprints
+```
